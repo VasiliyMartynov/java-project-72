@@ -1,0 +1,66 @@
+plugins {
+    id 'application'
+    id 'checkstyle'
+    id 'jacoco'
+    id 'com.adarshr.test-logger' version '3.2.0'
+    id 'com.github.ben-manes.versions' version '0.42.0'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainClass = 'hexlet.code.App'
+}
+
+dependencies {
+    //javalin
+    implementation 'io.javalin:javalin-bundle:5.6.1'
+    implementation 'io.javalin:javalin-rendering:5.6.0'
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
+
+
+
+    //шабланизатор
+    implementation 'org.thymeleaf:thymeleaf:3.1.1.RELEASE'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.2.1'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE'
+    implementation 'org.webjars:bootstrap:5.3.0'
+
+    //databases
+    implementation 'com.h2database:h2:2.2.222'
+    implementation("com.zaxxer:HikariCP:5.0.1")
+
+
+    //html parse
+    implementation 'org.jsoup:jsoup:1.16.1'
+
+    //tests
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.slf4j:slf4j-simple:2.0.7'
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation "org.mockito:mockito-core:3.+"
+    implementation group: 'com.konghq', name: 'unirest-java', version: '3.14.5'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.11.0'
+
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}
+
+checkstyle {
+    toolVersion '10.12.1'
+}
