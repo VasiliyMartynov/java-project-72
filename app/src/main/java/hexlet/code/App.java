@@ -36,11 +36,12 @@ public class App {
     }
 
     private static void addRoutes(Javalin app) {
-        app.get("/", RootController.welcome);
-        app.post("/urls", UrlsController.addUrl);
-        app.get("/urls", UrlsController.listOfUrls);
-        app.get("/urls/{id}", UrlsController.showUrl);
-        app.post("/urls/{id}/checks", UrlsController.checks);
+
+        app.get("/", RootController::welcome);
+        app.post("/urls", UrlsController::addUrl);
+        app.get("/urls", UrlsController::listOfUrls);
+        app.get("/urls/{id}", UrlsController::showUrl);
+        app.post("/urls/{id}/checks", UrlsController::checks);
     }
 
     public static Javalin getApp() throws SQLException, IOException {

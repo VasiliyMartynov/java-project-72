@@ -6,7 +6,7 @@ import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import static hexlet.code.repository.UrlRepository.save;
 
-import io.javalin.http.Handler;
+import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
 
 import kong.unirest.HttpResponse;
@@ -17,12 +17,13 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
 public class UrlsController {
 
-    public static Handler addUrl = ctx -> {
+    public static void addUrl(Context ctx) throws SQLException {
 
         String urlName  = ctx.formParam("url");
         System.out.println("----------------");
@@ -58,14 +59,14 @@ public class UrlsController {
 
     };
 
-    public static Handler listOfUrls = ctx -> {
+    public static void listOfUrls(Context ctx) throws SQLException {
 
         List<Url> urls = UrlRepository.getEntities();
         ctx.attribute("urls", urls);
         ctx.render("urls/urls.html");
     };
 
-    public static Handler showUrl = ctx -> {
+    public static void showUrl(Context ctx) throws SQLException {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
 
         Url url = UrlRepository.find(id);
@@ -81,7 +82,7 @@ public class UrlsController {
 
     };
 
-    public static Handler checks = ctx -> {
+    public static void checks(Context ctx) throws SQLException, IOException {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
 
         Url url = UrlRepository.find(id);
@@ -127,20 +128,4 @@ public class UrlsController {
 
         return new UrlCheck(urlStatusCode, urlTitle, urlH1Value, urlDescription, (int) url.getId(), createdAt);
     }
-
-//    public static Handler getAddUrl() {
-//        return addUrl;
-//    }
-//
-//    public static Handler getListOfUrls() {
-//        return addUrl;
-//    }
-//
-//    public static Handler getShowUrl() {
-//        return addUrl;
-//    }
-//
-//    public static Handler getChecks() {
-//        return addUrl;
-//    }
 }
