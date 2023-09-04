@@ -30,8 +30,6 @@ public class AppTest {
     private static Javalin app;
     private static MockWebServer mockServer;
     private static String baseUrl;
-
-    private static String testUrl;
     private static HikariConfig hikariConfig;
     protected static HikariDataSource dataSource;
 
@@ -59,7 +57,7 @@ public class AppTest {
         hikariConfig.setJdbcUrl("jdbc:h2:mem:java72test;DB_CLOSE_DELAY=-1;");
         dataSource = new HikariDataSource(hikariConfig);
         BaseTestRepository.setDataSource(dataSource);
-        TestUtils.executeSQL("schema.sql");
+//        TestUtils.executeSQL("schema.sql");
 
         //Mock server setup
         mockServer = new MockWebServer();
@@ -67,7 +65,7 @@ public class AppTest {
                 .setBody(readFixture("index.html"));
         mockServer.enqueue(mockedResponse);
         mockServer.start();
-        testUrl = mockServer.url("/").toString().replaceAll("/$", "");
+        //testUrl = mockServer.url("/").toString().replaceAll("/$", "");
     }
 
     @BeforeEach
@@ -94,7 +92,7 @@ public class AppTest {
 
         @Test
         void testAddUrl() {
-
+            String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
             HttpResponse responsePost = Unirest
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
@@ -133,6 +131,7 @@ public class AppTest {
 
         @Test
         void testAddSameUrl() {
+            String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
             HttpResponse responsePost1 = Unirest
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
@@ -157,6 +156,7 @@ public class AppTest {
 
         @Test
         void testListOfUrls() {
+            String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
             String inputUrl2 = baseUrl;
             Unirest
                     .post(baseUrl + "/urls")
@@ -179,6 +179,7 @@ public class AppTest {
 
         @Test
         void testShowUrl() {
+            String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
             Unirest
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
@@ -195,6 +196,7 @@ public class AppTest {
 
         @Test
         void testCheckUrl() {
+            String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
             Unirest
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
