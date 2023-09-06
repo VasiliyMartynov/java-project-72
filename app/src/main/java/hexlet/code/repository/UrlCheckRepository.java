@@ -4,40 +4,34 @@ import hexlet.code.BaseRepository;
 import hexlet.code.domain.UrlCheck;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
+        List<UrlCheck> urlsChecks = getEntities();
         String sql = "INSERT INTO url_check ("
+                + "id,"
                 + " status_code,"
                 + " title,"
                 + " h1,"
                 + " description,"
                 + " url_id,"
                 + " created_at)"
-                + " VALUES (?,?,?,?,?,?)";
+                + " VALUES (?,?,?,?,?,?,?)";
         try (var conn = BaseRepository.getDataSource().getConnection();
-             var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            preparedStatement.setString(1, String.valueOf(urlCheck.getStatusCode()));
-            preparedStatement.setString(2, urlCheck.getTitle());
-            preparedStatement.setString(3, urlCheck.getH1());
-            preparedStatement.setString(4, urlCheck.getDescription());
-            preparedStatement.setString(5, String.valueOf(urlCheck.getUrlId()));
+             var preparedStatement = conn.prepareStatement(sql)) {
+            preparedStatement.setInt(1, urlsChecks.size() + 1);
+            preparedStatement.setString(2, String.valueOf(urlCheck.getStatusCode()));
+            preparedStatement.setString(3, urlCheck.getTitle());
+            preparedStatement.setString(4, urlCheck.getH1());
+            preparedStatement.setString(5, urlCheck.getDescription());
+            preparedStatement.setString(6, String.valueOf(urlCheck.getUrlId()));
             String createdAt = String.valueOf(new Timestamp(System.currentTimeMillis()));
-            preparedStatement.setString(6, createdAt);
+            preparedStatement.setString(7, createdAt);
 
             preparedStatement.executeUpdate();
-            var generatedKeys = preparedStatement.getGeneratedKeys();
-            // Устанавливаем ID в сохраненную сущность
-            if (generatedKeys.next()) {
-                urlCheck.setId(generatedKeys.getLong(1));
-            } else {
-                throw new SQLException("DB have not returned an id after saving an entity");
-            }
         }
     }
 
@@ -97,7 +91,6 @@ public class UrlCheckRepository extends BaseRepository {
                 var title = resultSet.getString("title");
                 var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
-                //var urlIdN = Integer.valueOf(resultSet.getString("url_id"));
                 var createdAt = Timestamp.valueOf(resultSet.getString("created_at"));
                 var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
                 urlCheck.setId(Long.valueOf(id));

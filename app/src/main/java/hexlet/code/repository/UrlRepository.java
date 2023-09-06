@@ -1,7 +1,6 @@
 package hexlet.code.repository;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,22 +11,15 @@ import hexlet.code.domain.Url;
 public class UrlRepository extends BaseRepository {
 
     public static void save(Url url) throws SQLException {
-        String sql = "INSERT INTO url (name, created_at) VALUES (?,?)";
-        try (var conn = BaseRepository.getDataSource().getConnection();
-             var preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, url.getName());
-
+        List<Url> urls = getEntities();
+        var conn = BaseRepository.getDataSource().getConnection();
+        String sql = "INSERT INTO url (id, name, created_at) VALUES (?,?,?)";
+        try (var preparedStatement = conn.prepareStatement(sql)) {
+            preparedStatement.setInt(1, urls.size() + 1);
+            preparedStatement.setString(2, url.getName());
             String createdAt = String.valueOf(new Timestamp(System.currentTimeMillis()));
-            preparedStatement.setString(2, createdAt);
-
+            preparedStatement.setString(3, createdAt);
             preparedStatement.executeUpdate();
-            var generatedKeys = preparedStatement.getGeneratedKeys();
-            // Устанавливаем ID в сохраненную сущность
-            if (generatedKeys.next()) {
-                url.setId(generatedKeys.getLong(1));
-            } else {
-                throw new SQLException("DB have not returned an id after saving an entity");
-            }
         }
     }
 
