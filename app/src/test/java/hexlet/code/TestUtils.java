@@ -16,13 +16,13 @@ public class TestUtils {
         return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
     }
 
-    static String getDatabaseUserName() {
-        return System.getenv().getOrDefault("JDBC_DATABASE_USERNAME", "sa");
-    }
-
-    static String getDatabasePassword() {
-        return System.getenv().getOrDefault("JDBC_DATABASE_USERNAME", "sa");
-    }
+//    static String getDatabaseUserName() {
+//        return System.getenv().getOrDefault("JDBC_DATABASE_USERNAME", "sa");
+//    }
+//
+//    static String getDatabasePassword() {
+//        return System.getenv().getOrDefault("JDBC_DATABASE_USERNAME", "sa");
+//    }
     static Long findIdByUlrName(HikariDataSource dataSource, String urlName) {
         var sql = "SELECT id FROM url WHERE name = ?";
         try (var conn = dataSource.getConnection();

@@ -12,8 +12,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import static hexlet.code.TestUtils.readFixture;
-import static hexlet.code.TestUtils.getDatabasePassword;
-import static hexlet.code.TestUtils.getDatabaseUserName;
+//import static hexlet.code.TestUtils.getDatabasePassword;
+//import static hexlet.code.TestUtils.getDatabaseUserName;
 import static hexlet.code.TestUtils.getDatabaseUrl;
 import static hexlet.code.TestUtils.findById;
 import static hexlet.code.TestUtils.findIdByUlrName;
@@ -45,8 +45,8 @@ public class AppTest {
         //DB setup
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
-        hikariConfig.setUsername(getDatabaseUserName());
-        hikariConfig.setUsername(getDatabasePassword());
+//        hikariConfig.setUsername(getDatabaseUserName());
+//        hikariConfig.setUsername(getDatabasePassword());
         dataSource = new HikariDataSource(hikariConfig);
 
         //Mock server setup

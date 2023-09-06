@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 import static hexlet.code.AppUtils.addRoutes;
 import static hexlet.code.AppUtils.getPort;
 import static hexlet.code.AppUtils.getDatabaseUrl;
-import static hexlet.code.AppUtils.getDatabaseUserName;
-import static hexlet.code.AppUtils.getDatabasePassword;
+//import static hexlet.code.AppUtils.getDatabaseUserName;
+//import static hexlet.code.AppUtils.getDatabasePassword;
 import static hexlet.code.AppUtils.isProduction;
 import static hexlet.code.AppUtils.getTemplateEngine;
 
@@ -29,8 +29,8 @@ public class App {
         System.setProperty("h2.traceLevel", "TRACE_LEVEL_SYSTEM_OUT=3");
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
-        hikariConfig.setUsername(getDatabaseUserName());
-        hikariConfig.setUsername(getDatabasePassword());
+//        hikariConfig.setUsername(getDatabaseUserName());
+//        hikariConfig.setUsername(getDatabasePassword());
         var dataSource = new HikariDataSource(hikariConfig);
 
         var url = App.class.getClassLoader().getResource("schema.sql");

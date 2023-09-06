@@ -26,13 +26,13 @@ public class AppUtils {
         return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
     }
 
-    static String getDatabaseUserName() {
-        return System.getenv().getOrDefault("JDBC_DATABASE_USERNAME", "sa");
-    }
-
-    static String getDatabasePassword() {
-        return System.getenv().getOrDefault("JDBC_DATABASE_USERNAME", "sa");
-    }
+//    static String getDatabaseUserName() {
+//        return System.getenv().getOrDefault("JDBC_DATABASE_USERNAME", "sa");
+//    }
+//
+//    static String getDatabasePassword() {
+//        return System.getenv().getOrDefault("JDBC_DATABASE_USERNAME", "sa");
+//    }
 
     static TemplateEngine getTemplateEngine() {
         TemplateEngine templateEngine = new TemplateEngine();
