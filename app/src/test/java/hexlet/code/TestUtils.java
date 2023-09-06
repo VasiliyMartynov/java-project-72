@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-
 public class TestUtils {
 
     static String getDatabaseUrl() {
