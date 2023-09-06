@@ -46,21 +46,20 @@ public class UrlsController {
             ctx.redirect("/urls");
             return;
         }
+
         Timestamp createdAt = new Timestamp(System.currentTimeMillis());
         Url urlForSave = new Url(normalizedUrl, createdAt);
         save(urlForSave);
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
         ctx.redirect("/urls");
-
-    };
+    }
 
     public static void listOfUrls(Context ctx) throws SQLException {
-
         List<Url> urls = UrlRepository.getEntities();
         ctx.attribute("urls", urls);
         ctx.render("urls/urls.html");
-    };
+    }
 
     public static void showUrl(Context ctx) throws SQLException {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
@@ -75,10 +74,9 @@ public class UrlsController {
         ctx.attribute("url", url);
         ctx.attribute("checks", urlChecks);
         ctx.render("urls/show.html");
+    }
 
-    };
-
-    public static void checks(Context ctx) throws SQLException, IOException {
+    public static void checks(Context ctx) throws SQLException {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
         Url url = UrlRepository.find(id);
         if (url == null) {
@@ -87,9 +85,9 @@ public class UrlsController {
         UrlCheckRepository.save(getCheck(url));
         ctx.attribute("url", url);
         ctx.redirect("/urls/" + id);
-    };
+    }
 
-    public static UrlCheck getCheck(Url url) throws IOException {
+    public static UrlCheck getCheck(Url url) {
         String checkedUrlName = url.getName();
 
         HttpResponse<String> urlResponse = Unirest
@@ -120,6 +118,12 @@ public class UrlsController {
         }
         Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-        return new UrlCheck(urlStatusCode, urlTitle, urlH1Value, urlDescription, (int) url.getId(), createdAt);
+        return new UrlCheck(
+                urlStatusCode,
+                urlTitle,
+                urlH1Value,
+                urlDescription,
+                (int) url.getId(),
+                createdAt);
     }
 }

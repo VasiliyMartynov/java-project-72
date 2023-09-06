@@ -5,13 +5,16 @@ import okhttp3.mockwebserver.MockWebServer;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import static hexlet.code.TestUtils.readFixture;
+import static hexlet.code.TestUtils.getDatabasePassword;
+import static hexlet.code.TestUtils.getDatabaseUserName;
+import static hexlet.code.TestUtils.getDatabaseUrl;
 import static hexlet.code.TestUtils.findById;
 import static hexlet.code.TestUtils.findIdByUlrName;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,9 +24,6 @@ import kong.unirest.Unirest;
 import io.javalin.Javalin;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 
 
@@ -32,19 +32,7 @@ public class AppTest {
     private static Javalin app;
     private static MockWebServer mockServer;
     private static String baseUrl;
-    private static HikariConfig hikariConfig;
     protected static HikariDataSource dataSource;
-
-    private static String readFixture(String fileName) throws IOException {
-        Path filePath = getFixturePath(fileName);
-        return Files.readString(filePath).trim();
-    }
-
-    private static Path getFixturePath(String fileName) {
-        return Paths.get("src", "test", "resources", "fixtures", fileName)
-                .toAbsolutePath().normalize();
-    }
-
 
     @BeforeAll
     public static void beforeAll() throws IOException, SQLException {
@@ -55,11 +43,11 @@ public class AppTest {
         baseUrl = "http://localhost:" + port;
 
         //DB setup
-        hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(getDatabaseUrl());
+        hikariConfig.setUsername(getDatabaseUserName());
+        hikariConfig.setUsername(getDatabasePassword());
         dataSource = new HikariDataSource(hikariConfig);
-        BaseTestRepository.setDataSource(dataSource);
-
 
         //Mock server setup
         mockServer = new MockWebServer();
@@ -69,13 +57,6 @@ public class AppTest {
                 .setBody(readFixture("index.html"));
         mockServer.enqueue(mockedResponse);
         mockServer.start();
-
-
-    }
-
-    @BeforeEach
-    final void beforeEach() throws IOException {
-
     }
 
     @AfterAll
@@ -136,7 +117,7 @@ public class AppTest {
         @Test
         void testAddSameUrl() {
             String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
-            HttpResponse responsePost1 = Unirest
+            Unirest
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
                     .asEmpty();
@@ -188,7 +169,6 @@ public class AppTest {
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
                     .asEmpty();
-            var id = findIdByUlrName(dataSource, testUrl);
             HttpResponse<String> response = Unirest
                     .get(baseUrl + "/urls/1")
                     .asString();
@@ -225,7 +205,5 @@ public class AppTest {
             assertThat(body).contains("statements of great people");
             assertThat(body).contains("Do not expect a miracle");
         }
-
-
     }
 }
