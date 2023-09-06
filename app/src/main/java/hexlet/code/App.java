@@ -35,6 +35,10 @@ public class App {
         return 8080;
     }
 
+    private static String getDatabaseUrl() {
+        return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
+    }
+
     private static void addRoutes(Javalin app) {
 
         app.get("/", RootController::welcome);
@@ -45,23 +49,12 @@ public class App {
     }
 
     public static Javalin getApp() throws SQLException, IOException {
+
         System.setProperty("h2.traceLevel", "TRACE_LEVEL_SYSTEM_OUT=3");
-
         var hikariConfig = new HikariConfig();
-        String dbConfig = System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
-        hikariConfig.setJdbcUrl(dbConfig);
-//        if (!isProduction()) {
-//            hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
-//        } else {
-//            String url = System.getenv().get("JDBC_DATABASE_URL");
-//            String username = System.getenv().get("JDBC_DATABASE_USERNAME");
-//            String password = System.getenv().get("JDBC_DATABASE_PASSWORD");
-//            hikariConfig.setJdbcUrl("jdbc:postgresql://db:5432/postgres?password=" + password + "&user=" + username);
-//
-//        }
-
-
+        hikariConfig.setJdbcUrl(getDatabaseUrl());
         var dataSource = new HikariDataSource(hikariConfig);
+
         var url = App.class.getClassLoader().getResource("schema.sql");
         var file = new File(url.getFile());
         var sql = Files.lines(file.toPath())
@@ -71,6 +64,7 @@ public class App {
              var statement = connection.createStatement()) {
             statement.execute(sql);
         }
+
         BaseRepository.setDataSource(dataSource);
 
         Javalin app = Javalin.create(config -> {
