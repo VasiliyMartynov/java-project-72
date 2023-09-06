@@ -27,6 +27,9 @@ public class App {
         System.setProperty("h2.traceLevel", "TRACE_LEVEL_SYSTEM_OUT=3");
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
+        if(isProduction()) {
+            hikariConfig.setDataSourceClassName("org.postgresql.ds.PGSimpleDataSource");
+        }
         var dataSource = new HikariDataSource(hikariConfig);
 
         var url = App.class.getClassLoader().getResource("schema.sql");
