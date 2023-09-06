@@ -23,10 +23,8 @@ import java.util.List;
 public class UrlsController {
 
     public static void addUrl(Context ctx) throws SQLException {
-        System.out.println("1");
         String urlName  = ctx.formParam("url");
         URL url;
-        System.out.println("2");
         try {
             url = new URL(urlName);
         } catch (MalformedURLException e) {
@@ -35,23 +33,23 @@ public class UrlsController {
             ctx.redirect("/");
             return;
         }
-        System.out.println("3");
+
         String normalizedUrl = url.getProtocol() + "://" + url.getAuthority();
-        System.out.println("4");
+
         Url urlFromDb = UrlRepository.findByName(normalizedUrl);
-        System.out.println("5");
+
         if (urlFromDb != null) {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "info");
             ctx.redirect("/urls");
             return;
         }
-        System.out.println("6");
+
         Timestamp createdAt = new Timestamp(System.currentTimeMillis());
         Url urlForSave = new Url(normalizedUrl, createdAt);
-        System.out.println("7");
+
         save(urlForSave);
-        System.out.println("8");
+
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
         ctx.redirect("/urls");
