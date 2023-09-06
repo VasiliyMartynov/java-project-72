@@ -48,7 +48,15 @@ public class App {
         System.setProperty("h2.traceLevel", "TRACE_LEVEL_SYSTEM_OUT=3");
 
         var hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+        if (!isProduction()) {
+            hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
+        } else {
+            //String url = System.getenv().get("JDBC_DATABASE_URL");
+            String username = System.getenv().get("JDBC_DATABASE_USERNAME");
+            String password = System.getenv().get("JDBC_DATABASE_PASSWORD");
+            hikariConfig.setJdbcUrl("jdbc:postgresql://db:5432/postgres?password=" + password + "&user=" + username);
+        }
+
 
         var dataSource = new HikariDataSource(hikariConfig);
         var url = App.class.getClassLoader().getResource("schema.sql");
