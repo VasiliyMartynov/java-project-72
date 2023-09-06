@@ -52,9 +52,7 @@ public class App {
             hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
         } else {
             //String url = System.getenv().get("JDBC_DATABASE_URL");
-            String username = System.getenv().get("JDBC_DATABASE_USERNAME");
-            String password = System.getenv().get("JDBC_DATABASE_PASSWORD");
-            hikariConfig.setJdbcUrl("jdbc:postgresql://db:5432/postgres?password=" + password + "&user=" + username);
+            hikariConfig.setJdbcUrl("jdbc:postgresql://db:5432/postgres?password=password&user=postgres");
         }
 
 
