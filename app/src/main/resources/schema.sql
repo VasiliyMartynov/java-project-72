@@ -13,7 +13,7 @@ create table url_check (
   status_code INT NOT NULL,
   title varchar(255),
   h1 varchar(255),
-  description CLOB,
+  description text,
   url_id INT,
   created_at timestamp not null
 );
