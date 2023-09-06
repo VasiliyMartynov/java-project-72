@@ -25,9 +25,6 @@ public class UrlsController {
 
     public static void addUrl(Context ctx) throws SQLException {
         String urlName  = ctx.formParam("url");
-        System.out.println("----------------");
-        System.out.println(urlName);
-        System.out.println("----------------");
         URL url;
 
         try {

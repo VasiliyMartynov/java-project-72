@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import static hexlet.code.TestUtils.findById;
+import static hexlet.code.TestUtils.findIdByUlrName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import kong.unirest.HttpResponse;
@@ -54,24 +56,25 @@ public class AppTest {
 
         //DB setup
         hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl("jdbc:h2:mem:java72test;DB_CLOSE_DELAY=-1;");
+        hikariConfig.setJdbcUrl("jdbc:h2:mem:project;DB_CLOSE_DELAY=-1;");
         dataSource = new HikariDataSource(hikariConfig);
         BaseTestRepository.setDataSource(dataSource);
-//        TestUtils.executeSQL("schema.sql");
+
 
         //Mock server setup
         mockServer = new MockWebServer();
         MockResponse mockedResponse = new MockResponse()
+                .addHeader("Content-Type", "text/html; charset=utf-8")
                 .setBody(readFixture("index.html"));
         mockServer.enqueue(mockedResponse);
         mockServer.start();
-        //testUrl = mockServer.url("/").toString().replaceAll("/$", "");
+
+
     }
 
     @BeforeEach
     final void beforeEach() throws IOException {
-        //execute SQL scripts
-        TestUtils.executeSQL("truncate.sql");
+
     }
 
     @AfterAll
@@ -92,10 +95,10 @@ public class AppTest {
 
         @Test
         void testAddUrl() {
-            String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
+            String inputUrl = "https://testwebpage.ru";
             HttpResponse responsePost = Unirest
                     .post(baseUrl + "/urls")
-                    .field("url", testUrl)
+                    .field("url", inputUrl)
                     .asEmpty();
 
             assertThat(responsePost.getStatus()).isEqualTo(302);
@@ -184,7 +187,7 @@ public class AppTest {
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
                     .asEmpty();
-
+            var id = findIdByUlrName(dataSource, testUrl);
             HttpResponse<String> response = Unirest
                     .get(baseUrl + "/urls/1")
                     .asString();
@@ -195,20 +198,47 @@ public class AppTest {
         }
 
         @Test
-        void testCheckUrl() {
+        void testCheckUrl() throws SQLException {
             String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
+
+            HttpResponse<String> responseTestWebServer = Unirest
+                    .get(testUrl)
+                    .asString();
+
+            int status = responseTestWebServer.getStatus();
+            String testWebServerContent = responseTestWebServer.getBody();
+            //
+            System.out.println(testUrl + " status " + status);
+            System.out.println("Content of " + testUrl);
+            System.out.println(testWebServerContent);
+            System.out.println("---------------");
+            System.out.println("Add " + testUrl + " to DB");
+            System.out.println("POST to " + baseUrl + "/urls");
+
             Unirest
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
                     .asEmpty();
 
+            System.out.println("Added to DB " + testUrl);
+
+            var id = findIdByUlrName(dataSource, testUrl);
+            var urlFromDB = findById(dataSource, id);
+
+            //http://localhost:8080/urls/1
+            //<form method="post" action="checks" th:attr="action=@{/urls/{id}/checks(id=*{getId()})}">
+            StringBuilder postURL = new StringBuilder(baseUrl + "/urls/" + id.toString() + "/checks");
+            System.out.println("POST url " + postURL);
             Unirest
-                    .post(baseUrl + "/urls/1/checks")
+                    .post(postURL.toString())
+                    .asString();
+            System.out.println("POST is done");
+
+            System.out.println("GET CHECK page");
+            HttpResponse<String> response = Unirest
+                    .get(baseUrl + "/urls/" + id)
                     .asString();
 
-            HttpResponse<String> response = Unirest
-                    .get(baseUrl + "/urls/1")
-                    .asString();
             String body = response.getBody();
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(body).contains(testUrl);

@@ -1,27 +1,43 @@
 package hexlet.code;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.sql.SQLException;
-import java.util.stream.Collectors;
+import com.zaxxer.hikari.HikariDataSource;
+import hexlet.code.domain.Url;
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
 
 
 public class TestUtils {
-
-    protected static void executeSQL(String sqlFileName) throws IOException {
-        var url = AppTest.class.getClassLoader().getResource(sqlFileName);
-        var file = new File(url.getFile());
-        var sql = Files.lines(file.toPath())
-                .collect(Collectors.joining("\n"));
-        var dataSource = BaseTestRepository.getDataSource();
-        try (var connection = dataSource.getConnection();
-             var statement = connection.createStatement()) {
-            statement.execute(sql);
+    static Long findIdByUlrName(HikariDataSource dataSource, String urlName) {
+        var sql = "SELECT id FROM url WHERE name = ?";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, urlName);
+            var resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                var id = resultSet.getLong("id");
+                return id;
+            }
+            return null;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    static Url findById(HikariDataSource dataSource, Long id) throws SQLException {
+        var sql = "SELECT * FROM url WHERE id = ?";
+        try (var conn = dataSource.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, id);
+            var resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                var name = resultSet.getString("name");
+                var createdAt = Timestamp.valueOf(resultSet.getString("created_at"));
+                var url = new Url(name, createdAt);
+                url.setId(Long.valueOf(id));
+                return url;
+            }
+            return null;
+        }
     }
 }
