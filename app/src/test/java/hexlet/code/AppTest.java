@@ -42,20 +42,11 @@ public class AppTest {
         int port = app.port();
         baseUrl = "http://localhost:" + port;
 
-        //DB setup
+//        //DB connection setup
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
         dataSource = new HikariDataSource(hikariConfig);
 
-        var url = App.class.getClassLoader().getResource("schema.sql");
-        var file = new File(url.getFile());
-        var sql = Files.lines(file.toPath())
-                .collect(Collectors.joining("\n"));
-
-        try (var connection = dataSource.getConnection();
-             var statement = connection.createStatement()) {
-            statement.execute(sql);
-        }
         BaseRepository.setDataSource(dataSource);
 
         //Mock server setup
