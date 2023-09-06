@@ -79,50 +79,47 @@ public class UrlsController {
     };
 
     public static void checks(Context ctx) throws SQLException, IOException {
-        System.out.println("check 1");
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
-        System.out.println("check 2");
         Url url = UrlRepository.find(id);
-        System.out.println("check 3");
         if (url == null) {
             throw new NotFoundResponse();
         }
-        System.out.println("check 4");
         UrlCheckRepository.save(getCheck(url));
-        System.out.println("check 5");
         ctx.attribute("url", url);
         ctx.redirect("/urls/" + id);
     };
 
     public static UrlCheck getCheck(Url url) throws IOException {
-        System.out.println("getCheck 1");
         String checkedUrlName = url.getName();
-        System.out.println("getCheck 2");
-        HttpResponse<String> urlResponse = Unirest.get(checkedUrlName).asString();
+
+        HttpResponse<String> urlResponse = Unirest
+                .get(checkedUrlName)
+                .asString();
+
         int urlStatusCode = urlResponse.getStatus();
-        System.out.println("getCheck 3");
-        Document urlDoc = Jsoup.connect(checkedUrlName).get();
-        System.out.println("getCheck 4");
+
+        Document urlDoc = Jsoup.parse(urlResponse.getBody());
         String urlH1Value = "";
+
         if (urlDoc.select("h1").first() != null) {
             urlH1Value = urlDoc.select("h1").first().text();
         }
-        System.out.println("getCheck 5");
+
         String urlTitle = "";
+
         if (urlDoc.select("title").first() != null) {
-            urlH1Value = urlDoc.select("title").first().text();
+            urlTitle = urlDoc.select("title").first().text();
         }
-        System.out.println("getCheck 6");
+
         String urlDescription = "";
-        System.out.println("getCheck 7");
+
         if (!urlDoc.select("meta[name=description]").isEmpty()) {
             urlDescription = urlDoc.select("meta[name=description]")
                     .get(0)
                     .attr("content");
         }
-        System.out.println("getCheck 8");
         Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-        System.out.println("getCheck 9");
+
         return new UrlCheck(urlStatusCode, urlTitle, urlH1Value, urlDescription, (int) url.getId(), createdAt);
     }
 }

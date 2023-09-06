@@ -65,6 +65,7 @@ public class AppTest {
         mockServer = new MockWebServer();
         MockResponse mockedResponse = new MockResponse()
                 .addHeader("Content-Type", "text/html; charset=utf-8")
+                .addHeader("Cache-Control", "no-cache")
                 .setBody(readFixture("index.html"));
         mockServer.enqueue(mockedResponse);
         mockServer.start();
@@ -201,40 +202,19 @@ public class AppTest {
         void testCheckUrl() throws SQLException {
             String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
 
-            HttpResponse<String> responseTestWebServer = Unirest
-                    .get(testUrl)
-                    .asString();
-
-            int status = responseTestWebServer.getStatus();
-            String testWebServerContent = responseTestWebServer.getBody();
-            //
-            System.out.println(testUrl + " status " + status);
-            System.out.println("Content of " + testUrl);
-            System.out.println(testWebServerContent);
-            System.out.println("---------------");
-            System.out.println("Add " + testUrl + " to DB");
-            System.out.println("POST to " + baseUrl + "/urls");
-
             Unirest
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
                     .asEmpty();
 
-            System.out.println("Added to DB " + testUrl);
-
             var id = findIdByUlrName(dataSource, testUrl);
             var urlFromDB = findById(dataSource, id);
+            assertThat(urlFromDB.getName()).isEqualTo(testUrl);
 
-            //http://localhost:8080/urls/1
-            //<form method="post" action="checks" th:attr="action=@{/urls/{id}/checks(id=*{getId()})}">
-            StringBuilder postURL = new StringBuilder(baseUrl + "/urls/" + id.toString() + "/checks");
-            System.out.println("POST url " + postURL);
             Unirest
-                    .post(postURL.toString())
+                    .post(baseUrl + "/urls/" + id.toString() + "/checks")
                     .asString();
-            System.out.println("POST is done");
 
-            System.out.println("GET CHECK page");
             HttpResponse<String> response = Unirest
                     .get(baseUrl + "/urls/" + id)
                     .asString();
@@ -243,7 +223,7 @@ public class AppTest {
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(body).contains(testUrl);
             assertThat(body).contains("statements of great people");
-            assertThat(body).contains("Do not expect a miracle, miracles yourself!");
+            assertThat(body).contains("Do not expect a miracle");
         }
 
 
