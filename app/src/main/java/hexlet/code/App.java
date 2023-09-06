@@ -27,9 +27,7 @@ public class App {
         System.setProperty("h2.traceLevel", "TRACE_LEVEL_SYSTEM_OUT=3");
         var hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
-
         var dataSource = new HikariDataSource(hikariConfig);
-
         var url = App.class.getClassLoader().getResource("schema.sql");
         var file = new File(url.getFile());
         var sql = Files.lines(file.toPath())

@@ -21,9 +21,11 @@ import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import io.javalin.Javalin;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.SQLException;
-
+import java.util.stream.Collectors;
 
 
 public class AppTest {
@@ -44,6 +46,17 @@ public class AppTest {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
         dataSource = new HikariDataSource(hikariConfig);
+
+        var url = App.class.getClassLoader().getResource("schema.sql");
+        var file = new File(url.getFile());
+        var sql = Files.lines(file.toPath())
+                .collect(Collectors.joining("\n"));
+
+        try (var connection = dataSource.getConnection();
+             var statement = connection.createStatement()) {
+            statement.execute(sql);
+        }
+        BaseRepository.setDataSource(dataSource);
 
         //Mock server setup
         mockServer = new MockWebServer();
