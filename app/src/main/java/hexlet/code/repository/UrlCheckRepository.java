@@ -11,15 +11,7 @@ import java.util.List;
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
         List<UrlCheck> urlsChecks = getEntities();
-        String sql = "INSERT INTO url_check ("
-                + "id,"
-                + " status_code,"
-                + " title,"
-                + " h1,"
-                + " description,"
-                + " url_id,"
-                + " created_at)"
-                + " VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO url_check VALUES (?,?,?,?,?,?,?)";
         try (var conn = BaseRepository.getDataSource().getConnection();
              var preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setInt(1, urlsChecks.size() + 1);
