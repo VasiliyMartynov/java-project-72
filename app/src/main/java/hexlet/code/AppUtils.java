@@ -23,7 +23,10 @@ public class AppUtils {
     }
 
     static String getDatabaseUrl() {
-        return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
+        return System.getenv().getOrDefault(
+                "JDBC_DATABASE_URL",
+                "jdbc:h2:mem:project");
+
     }
 
     static TemplateEngine getTemplateEngine() {
@@ -41,7 +44,6 @@ public class AppUtils {
     }
 
     static void addRoutes(Javalin app) {
-
         app.get("/", RootController::welcome);
         app.post("/urls", UrlsController::addUrl);
         app.get("/urls", UrlsController::listOfUrls);

@@ -89,7 +89,6 @@ public class UrlsController {
 
     public static UrlCheck getCheck(Url url) {
         String checkedUrlName = url.getName();
-
         HttpResponse<String> urlResponse = Unirest
                 .get(checkedUrlName)
                 .asString();
@@ -104,20 +103,17 @@ public class UrlsController {
         }
 
         String urlTitle = "";
-
         if (urlDoc.select("title").first() != null) {
             urlTitle = urlDoc.select("title").first().text();
         }
 
         String urlDescription = "";
-
         if (!urlDoc.select("meta[name=description]").isEmpty()) {
             urlDescription = urlDoc.select("meta[name=description]")
                     .get(0)
                     .attr("content");
         }
         Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-
         return new UrlCheck(
                 urlStatusCode,
                 urlTitle,

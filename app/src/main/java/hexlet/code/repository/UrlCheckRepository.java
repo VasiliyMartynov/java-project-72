@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import static hexlet.code.repository.UrlRepository.getDate;
+
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
         List<UrlCheck> urlsChecks = getEntities();
@@ -15,14 +17,13 @@ public class UrlCheckRepository extends BaseRepository {
         try (var conn = BaseRepository.getDataSource().getConnection();
              var preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setInt(1, urlsChecks.size() + 1);
-            preparedStatement.setString(2, String.valueOf(urlCheck.getStatusCode()));
+            preparedStatement.setInt(2, urlCheck.getStatusCode());
             preparedStatement.setString(3, urlCheck.getTitle());
             preparedStatement.setString(4, urlCheck.getH1());
             preparedStatement.setString(5, urlCheck.getDescription());
-            preparedStatement.setString(6, String.valueOf(urlCheck.getUrlId()));
-            String createdAt = String.valueOf(new Timestamp(System.currentTimeMillis()));
-            preparedStatement.setString(7, createdAt);
-
+            preparedStatement.setInt(6, urlCheck.getUrlId());
+            var createdAt = getDate();
+            preparedStatement.setTimestamp(7, createdAt);
             preparedStatement.executeUpdate();
         }
     }

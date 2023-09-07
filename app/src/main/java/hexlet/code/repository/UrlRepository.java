@@ -2,8 +2,9 @@ package hexlet.code.repository;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
+import java.util.ArrayList;
 
 import hexlet.code.BaseRepository;
 import hexlet.code.domain.Url;
@@ -17,8 +18,7 @@ public class UrlRepository extends BaseRepository {
         try (var preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setInt(1, urls.size() + 1);
             preparedStatement.setString(2, url.getName());
-            String createdAt = String.valueOf(new Timestamp(System.currentTimeMillis()));
-            preparedStatement.setString(3, createdAt);
+            preparedStatement.setTimestamp(3, getDate());
             preparedStatement.executeUpdate();
         }
     }
@@ -31,8 +31,7 @@ public class UrlRepository extends BaseRepository {
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
-                var createdAt = Timestamp.valueOf(resultSet.getString("created_at"));
-                var url = new Url(name, createdAt);
+                var url = new Url(name, getDate());
                 url.setId(Long.valueOf(id));
                 return url;
             }
@@ -49,8 +48,7 @@ public class UrlRepository extends BaseRepository {
             if (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var createdAt = Timestamp.valueOf(resultSet.getString("created_at"));
-                var url = new Url(name, createdAt);
+                var url = new Url(name, getDate());
                 url.setId(Long.valueOf(id));
                 return url;
             }
@@ -61,18 +59,22 @@ public class UrlRepository extends BaseRepository {
     public static List<Url> getEntities() throws SQLException {
         var sql = "SELECT * FROM url";
         try (var conn = BaseRepository.getDataSource().getConnection();
-             var stmt = conn.prepareStatement(sql)) {
+            var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
             var result = new ArrayList<Url>();
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var createdAt = Timestamp.valueOf(resultSet.getString("created_at"));
-                var url = new Url(name, createdAt);
+                var url = new Url(name, getDate());
                 url.setId(Long.valueOf(id));
                 result.add(url);
             }
             return result;
         }
+    }
+    static Timestamp getDate() {
+        String s = "2019-10-11T12:12:23.234Z";
+        Timestamp createdAt = Timestamp.from(Instant.parse(s));
+        return createdAt;
     }
 }
