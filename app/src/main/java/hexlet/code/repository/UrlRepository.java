@@ -32,7 +32,7 @@ public class UrlRepository extends BaseRepository {
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
                 var url = new Url(name, getDate());
-                url.setId(Long.valueOf(id));
+                url.setId((long) id);
                 return url;
             }
             return null;
