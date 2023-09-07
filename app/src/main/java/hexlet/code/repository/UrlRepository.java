@@ -74,7 +74,6 @@ public class UrlRepository extends BaseRepository {
     }
     static Timestamp getDate() {
         String s = "2019-10-11T12:12:23.234Z";
-        Timestamp createdAt = Timestamp.from(Instant.parse(s));
-        return createdAt;
+        return Timestamp.from(Instant.parse(s));
     }
 }
