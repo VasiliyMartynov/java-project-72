@@ -49,7 +49,7 @@ public class UrlRepository extends BaseRepository {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
                 var url = new Url(name, getDate());
-                url.setId(Long.valueOf(id));
+                url.setId(id);
                 return url;
             }
             return null;
@@ -66,7 +66,7 @@ public class UrlRepository extends BaseRepository {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
                 var url = new Url(name, getDate());
-                url.setId(Long.valueOf(id));
+                url.setId(id);
                 result.add(url);
             }
             return result;
