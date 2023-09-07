@@ -4,7 +4,6 @@ import hexlet.code.BaseRepository;
 import hexlet.code.domain.UrlCheck;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,27 +27,6 @@ public class UrlCheckRepository extends BaseRepository {
         }
     }
 
-    public static UrlCheck find(int id) throws SQLException {
-        var sql = "SELECT * FROM url_check WHERE id = ?";
-        try (var conn = BaseRepository.getDataSource().getConnection();
-             var stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-            var resultSet = stmt.executeQuery();
-            if (resultSet.next()) {
-                var statusCode = Integer.valueOf(resultSet.getString("status_code"));
-                var title = resultSet.getString("title");
-                var h1 = resultSet.getString("h1");
-                var description = resultSet.getString("description");
-                var urlId = Integer.valueOf(resultSet.getString("url_id"));
-                var createdAt = Timestamp.valueOf(resultSet.getString("created_at"));
-                var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
-                urlCheck.setId(Long.valueOf(id));
-                return urlCheck;
-            }
-            return null;
-        }
-    }
-
     public static List<UrlCheck> getEntities() throws SQLException {
         var sql = "SELECT * FROM url_check";
         try (var conn = BaseRepository.getDataSource().getConnection();
@@ -57,12 +35,12 @@ public class UrlCheckRepository extends BaseRepository {
             var result = new ArrayList<UrlCheck>();
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
-                var statusCode = Integer.valueOf(resultSet.getString("status_code"));
+                var statusCode = resultSet.getInt("status_code");
                 var title = resultSet.getString("title");
                 var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
-                var urlId = Integer.valueOf(resultSet.getString("url_id"));
-                var createdAt = Timestamp.valueOf(resultSet.getString("created_at"));
+                var urlId = resultSet.getInt("url_id");
+                var createdAt = resultSet.getTimestamp("created_at");
                 var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
                 urlCheck.setId(Long.valueOf(id));
                 result.add(urlCheck);
@@ -80,11 +58,11 @@ public class UrlCheckRepository extends BaseRepository {
             var result = new ArrayList<UrlCheck>();
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
-                var statusCode = Integer.valueOf(resultSet.getString("status_code"));
+                var statusCode = resultSet.getInt("status_code");
                 var title = resultSet.getString("title");
                 var h1 = resultSet.getString("h1");
                 var description = resultSet.getString("description");
-                var createdAt = Timestamp.valueOf(resultSet.getString("created_at"));
+                var createdAt = resultSet.getTimestamp("created_at");
                 var urlCheck = new UrlCheck(statusCode, title, h1, description, urlId, createdAt);
                 urlCheck.setId(Long.valueOf(id));
                 result.add(urlCheck);
