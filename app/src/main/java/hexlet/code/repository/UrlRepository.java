@@ -18,21 +18,22 @@ public class UrlRepository extends BaseRepository {
         try (var preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setInt(1, urls.size() + 1);
             preparedStatement.setString(2, url.getName());
-            preparedStatement.setTimestamp(3, getDate());
+            preparedStatement.setTimestamp(3, Timestamp.from(getDate()));
             preparedStatement.executeUpdate();
         }
     }
 
-    public static Url find(int id) throws SQLException {
+    public static Url find(Long id) throws SQLException {
         var sql = "SELECT * FROM urls WHERE id = ?";
         try (var conn = BaseRepository.getDataSource().getConnection();
-             var stmt = conn.prepareStatement(sql)) {
+            var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
-                var url = new Url(name, getDate());
-                url.setId((long) id);
+                var createdAt = resultSet.getTimestamp("created_at");
+                var url = new Url(name, createdAt.toInstant());
+                url.setId(id);
                 return url;
             }
             return null;
@@ -42,13 +43,14 @@ public class UrlRepository extends BaseRepository {
     public static Url findByName(String urlName) throws SQLException {
         var sql = "SELECT * FROM urls WHERE name = ?";
         try (var conn = BaseRepository.getDataSource().getConnection();
-             var stmt = conn.prepareStatement(sql)) {
+            var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, urlName);
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var url = new Url(name, getDate());
+                var createdAt = resultSet.getTimestamp("created_at");
+                var url = new Url(name, createdAt.toInstant());
                 url.setId(id);
                 return url;
             }
@@ -65,15 +67,16 @@ public class UrlRepository extends BaseRepository {
             while (resultSet.next()) {
                 var id = resultSet.getLong("id");
                 var name = resultSet.getString("name");
-                var url = new Url(name, getDate());
+                var createdAt = resultSet.getTimestamp("created_at");
+                var url = new Url(name, createdAt.toInstant());
                 url.setId(id);
                 result.add(url);
             }
             return result;
         }
     }
-    static Timestamp getDate() {
-        String s = "2019-10-11T12:12:23.234Z";
-        return Timestamp.from(Instant.parse(s));
+    public static Instant getDate() {
+        return Instant.now();
     }
+
 }

@@ -1,6 +1,6 @@
 package hexlet.code.domain;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 public final class UrlCheck {
 
@@ -13,20 +13,16 @@ public final class UrlCheck {
 
     private String description;
 
-    private int urlId;
+    private long urlId;
 
-    private Timestamp createdAt;
-
-    public UrlCheck() {
-        super();
-    }
+    private Instant createdAt;
 
     public UrlCheck(int urlStatusCode,
                     String urlTitle,
                     String urlH1,
                     String urlDescription,
-                    int urlIdN,
-                    Timestamp checkCreatedAtn) {
+                    long urlIdN,
+                    Instant checkCreatedAtn) {
         this.statusCode = urlStatusCode;
         this.title = urlTitle;
         this.h1 = urlH1;
@@ -55,7 +51,7 @@ public final class UrlCheck {
         return this.description;
     }
 
-    public int getUrlId() {
+    public long getUrlId() {
         return urlId;
     }
 
@@ -63,15 +59,8 @@ public final class UrlCheck {
         this.id = newid;
     }
 
-    public int getUrl() {
-        return this.urlId;
-    }
-
-    public Timestamp getCreatedAt() {
+    public Instant getCreatedAt() {
         return this.createdAt;
     }
 
-    public String getCreatedAtAsString() {
-        return this.createdAt.toString();
-    }
 }

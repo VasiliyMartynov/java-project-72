@@ -4,7 +4,6 @@ import hexlet.code.domain.Url;
 import hexlet.code.domain.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
-import static hexlet.code.repository.UrlRepository.save;
 
 import io.javalin.http.Context;
 import io.javalin.http.NotFoundResponse;
@@ -17,15 +16,23 @@ import org.jsoup.nodes.Document;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+
+import static hexlet.code.repository.UrlCheckRepository.getLastCheckOfUrl;
+import static hexlet.code.repository.UrlRepository.getDate;
+import static hexlet.code.repository.UrlRepository.save;
+import static hexlet.code.repository.UrlRepository.getEntities;
 
 public class UrlsController {
 
     public static void addUrl(Context ctx) throws SQLException {
-        String urlName  = ctx.formParam("url");
+        String urlName;
+        urlName = ctx.formParam("url");
         URL url;
         try {
+            assert urlName != null;
             url = new URL(urlName);
         } catch (MalformedURLException e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
@@ -45,8 +52,7 @@ public class UrlsController {
             return;
         }
 
-        Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-        Url urlForSave = new Url(normalizedUrl, createdAt);
+        Url urlForSave = new Url(normalizedUrl, getDate());
 
         save(urlForSave);
 
@@ -56,13 +62,23 @@ public class UrlsController {
     }
 
     public static void listOfUrls(Context ctx) throws SQLException {
-        List<Url> urls = UrlRepository.getEntities();
-        ctx.attribute("urls", urls);
+        List<UrlAndCheck> urlAndChecks = new ArrayList<>();
+        for (Url url : getEntities()) {
+            if (UrlCheckRepository.getLastCheckOfUrl(url.getId()) != null) {
+                UrlCheck urlCheck = getLastCheckOfUrl(url.getId());
+                assert urlCheck != null;
+                UrlAndCheck urlAndCheck = new UrlAndCheck(url, urlCheck);
+                urlAndChecks.add(urlAndCheck);
+            } else  {
+                urlAndChecks.add(new UrlAndCheck(url));
+            }
+        }
+        ctx.attribute("urlAndChecks", urlAndChecks);
         ctx.render("urls/urls.html");
     }
 
     public static void showUrl(Context ctx) throws SQLException {
-        int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
+        Long id = Long.valueOf(ctx.pathParamAsClass("id", Integer.class).getOrDefault(null));
 
         Url url = UrlRepository.find(id);
 
@@ -77,7 +93,7 @@ public class UrlsController {
     }
 
     public static void checks(Context ctx) throws SQLException {
-        int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
+        Long id = Long.valueOf(ctx.pathParamAsClass("id", Integer.class).getOrDefault(null));
         Url url = UrlRepository.find(id);
         if (url == null) {
             throw new NotFoundResponse();
@@ -113,13 +129,45 @@ public class UrlsController {
                     .get(0)
                     .attr("content");
         }
-        Timestamp createdAt = new Timestamp(System.currentTimeMillis());
         return new UrlCheck(
                 urlStatusCode,
                 urlTitle,
                 urlH1Value,
                 urlDescription,
                 (int) url.getId(),
-                createdAt);
+                getDate());
+    }
+    private static class UrlAndCheck {
+        private long id;
+        private String name;
+        private Instant createdAt;
+        private int statusCode;
+
+        UrlAndCheck(Url url, UrlCheck urlCheck) {
+            this.id = url.getId();
+            this.name = url.getName();
+            this.createdAt = urlCheck.getCreatedAt();
+            this.statusCode = urlCheck.getStatusCode();
+        }
+        UrlAndCheck(Url url) {
+            this.id = url.getId();
+            this.name = url.getName();
+        }
+        public long getId() {
+            return this.id;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public Instant getCreatedAt() {
+            return this.createdAt;
+        }
+
+        public int getStatusCode() {
+            return this.statusCode;
+        }
+
     }
 }

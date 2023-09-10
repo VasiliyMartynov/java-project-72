@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 public class TestUtils {
 
@@ -39,8 +38,8 @@ public class TestUtils {
             var resultSet = stmt.executeQuery();
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
-                var createdAt = Timestamp.valueOf(resultSet.getString("created_at"));
-                var url = new Url(name, createdAt);
+                var createdAt = resultSet.getTimestamp("created_at");
+                var url = new Url(name, createdAt.toInstant());
                 url.setId(id);
                 return url;
             }

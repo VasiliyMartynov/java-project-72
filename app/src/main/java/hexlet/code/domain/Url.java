@@ -1,19 +1,15 @@
 package hexlet.code.domain;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 public final class Url {
     private long id;
 
     private String name;
 
-    private Timestamp createdAt;
+    private Instant createdAt;
 
-    public Url() {
-        super();
-    }
-
-    public Url(String urlName, Timestamp urlCreatedAt) {
+    public Url(String urlName, Instant urlCreatedAt) {
         this.name = urlName;
         this.createdAt = urlCreatedAt;
     }
@@ -26,12 +22,8 @@ public final class Url {
         return this.name;
     }
 
-    public Timestamp getCreatedAt() {
+    public Instant getCreatedAt() {
         return this.createdAt;
-    }
-
-    public String getCreatedAtAsString() {
-        return this.createdAt.toString();
     }
 
     public void setId(Long newid) {
