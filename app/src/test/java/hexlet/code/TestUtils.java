@@ -17,7 +17,7 @@ public class TestUtils {
     }
 
     static Long findIdByUlrName(HikariDataSource dataSource, String urlName) {
-        var sql = "SELECT id FROM url WHERE name = ?";
+        var sql = "SELECT id FROM urls WHERE name = ?";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, urlName);
@@ -31,8 +31,8 @@ public class TestUtils {
         }
     }
 
-    static Url findById(HikariDataSource dataSource, Long id) throws SQLException {
-        var sql = "SELECT * FROM url WHERE id = ?";
+    static Url findUrlById(HikariDataSource dataSource, Long id) throws SQLException {
+        var sql = "SELECT * FROM urls WHERE id = ?";
         try (var conn = dataSource.getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);

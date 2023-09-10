@@ -14,7 +14,7 @@ public class UrlRepository extends BaseRepository {
     public static void save(Url url) throws SQLException {
         List<Url> urls = getEntities();
         var conn = BaseRepository.getDataSource().getConnection();
-        String sql = "INSERT INTO url VALUES (?,?,?)";
+        String sql = "INSERT INTO urls VALUES (?,?,?)";
         try (var preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setInt(1, urls.size() + 1);
             preparedStatement.setString(2, url.getName());
@@ -24,7 +24,7 @@ public class UrlRepository extends BaseRepository {
     }
 
     public static Url find(int id) throws SQLException {
-        var sql = "SELECT * FROM url WHERE id = ?";
+        var sql = "SELECT * FROM urls WHERE id = ?";
         try (var conn = BaseRepository.getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, id);
@@ -40,7 +40,7 @@ public class UrlRepository extends BaseRepository {
     }
 
     public static Url findByName(String urlName) throws SQLException {
-        var sql = "SELECT * FROM url WHERE name = ?";
+        var sql = "SELECT * FROM urls WHERE name = ?";
         try (var conn = BaseRepository.getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, urlName);
@@ -57,7 +57,7 @@ public class UrlRepository extends BaseRepository {
     }
 
     public static List<Url> getEntities() throws SQLException {
-        var sql = "SELECT * FROM url";
+        var sql = "SELECT * FROM urls";
         try (var conn = BaseRepository.getDataSource().getConnection();
             var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();

@@ -1,14 +1,14 @@
-DROP TABLE IF EXISTS url;
+DROP TABLE IF EXISTS urls;
 
-create table url (
+create table urls (
   id INT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   created_at timestamp not null
 );
 
-DROP TABLE IF EXISTS url_check;
+DROP TABLE IF EXISTS url_checks;
 
-create table url_check (
+create table url_checks (
   id INT PRIMARY KEY,
   status_code INT NOT NULL,
   title varchar(255),

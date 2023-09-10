@@ -13,7 +13,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import static hexlet.code.TestUtils.readFixture;
 import static hexlet.code.TestUtils.getDatabaseUrl;
-import static hexlet.code.TestUtils.findById;
+import static hexlet.code.TestUtils.findUrlById;
 import static hexlet.code.TestUtils.findIdByUlrName;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -185,7 +185,7 @@ public class AppTest {
                     .asEmpty();
 
             var id = findIdByUlrName(dataSource, testUrl);
-            var urlFromDB = findById(dataSource, id);
+            var urlFromDB = findUrlById(dataSource, id);
             assertThat(urlFromDB.getName()).isEqualTo(testUrl);
 
             Unirest

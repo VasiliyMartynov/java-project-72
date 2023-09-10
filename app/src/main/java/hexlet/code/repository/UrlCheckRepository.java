@@ -12,7 +12,7 @@ import static hexlet.code.repository.UrlRepository.getDate;
 public class UrlCheckRepository extends BaseRepository {
     public static void save(UrlCheck urlCheck) throws SQLException {
         List<UrlCheck> urlsChecks = getEntities();
-        String sql = "INSERT INTO url_check VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO url_checks VALUES (?,?,?,?,?,?,?)";
         try (var conn = BaseRepository.getDataSource().getConnection();
              var preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setInt(1, urlsChecks.size() + 1);
@@ -28,7 +28,7 @@ public class UrlCheckRepository extends BaseRepository {
     }
 
     public static List<UrlCheck> getEntities() throws SQLException {
-        var sql = "SELECT * FROM url_check";
+        var sql = "SELECT * FROM url_checks";
         try (var conn = BaseRepository.getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             var resultSet = stmt.executeQuery();
@@ -50,7 +50,7 @@ public class UrlCheckRepository extends BaseRepository {
     }
 
     public static List<UrlCheck> getEntitiesByUrlId(int urlId) throws SQLException {
-        var sql = "SELECT * FROM url_check WHERE url_id = ?";
+        var sql = "SELECT * FROM url_checks WHERE url_id = ?";
         try (var conn = BaseRepository.getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, urlId);
