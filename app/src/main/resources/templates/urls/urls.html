@@ -12,31 +12,19 @@
                 <th>Имя</th>
                 <th class="col-2">Последняя проверка</th>
                 <th class="col-1">Код ответа</th>
-
             </tr>
             </thead>
-
             <tbody>
-<!--                     like foreach  ctx object       class of object-->
-        <!--            <tr th:each="url : ${urls}" th:object="${url}">-->
-                    <tr th:each="urlAndCheck : ${urlAndChecks}" th:object="${urlAndCheck}">
-                    <td th:text="*{getId()}"></td>
+                    <tr th:each="url: ${urls}">
+                    <td th:text="*{url.id}"></td>
                     <td>
-                        <a th:href="@{/urls/{id}(id=*{getId()})}" th:text="${#strings.abbreviate(urlAndCheck.getName(), 30)}"></a>
+                        <a th:href="@{/urls/{id}(id=*{url.id})}" th:text="${#strings.abbreviate(url.name, 30)}"></a>
                     </td>
-                    <td th:text="${#temporals.format(urlAndCheck.getCreatedAt(), 'dd-MM-yyyy HH:mm')}"></td>
-                    <td th:text="*{getStatusCode()}"></td>
-<!--                <tr th:each="url : ${urls}" th:object="${url}">-->
-<!--                <td th:text="*{getId()}"></td>-->
-<!--                <td>-->
-<!--                    <a th:href="@{/urls/{id}(id=*{getId()})}" th:text="${#strings.abbreviate(url.getName(), 30)}"></a>-->
-<!--                </td>-->
-<!--                <td th:text="${#temporals.format(url.getCreatedAt(), 'dd-MM-yyyy HH:mm')}"></td>-->
-<!--                <td th:text="*{getId()}"></td>-->
+                    <td th:text="${urlChecks.get(url.id) == null ? '' : #temporals.format(urlChecks.get(url.id).getCreatedAt(), 'dd-MM-yyyy HH:mm')}"></td>
+                    <td th:text="${urlChecks.get(url.id) == null ? '' : urlChecks.get(url.id).getStatusCode()}"></td>
             </tr>
             </tbody>
         </table>
     </div>
 </section>
-
 </html>

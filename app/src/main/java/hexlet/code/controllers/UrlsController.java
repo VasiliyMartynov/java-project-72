@@ -16,14 +16,9 @@ import org.jsoup.nodes.Document;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-
-import static hexlet.code.repository.UrlCheckRepository.getLastCheckOfUrl;
-import static hexlet.code.repository.UrlRepository.getDate;
+import java.util.Map;
 import static hexlet.code.repository.UrlRepository.save;
-import static hexlet.code.repository.UrlRepository.getEntities;
 
 public class UrlsController {
 
@@ -31,8 +26,8 @@ public class UrlsController {
         String urlName;
         urlName = ctx.formParam("url");
         URL url;
+
         try {
-            assert urlName != null;
             url = new URL(urlName);
         } catch (MalformedURLException e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
@@ -42,7 +37,6 @@ public class UrlsController {
         }
 
         String normalizedUrl = url.getProtocol() + "://" + url.getAuthority();
-
         Url urlFromDb = UrlRepository.findByName(normalizedUrl);
 
         if (urlFromDb != null) {
@@ -52,8 +46,7 @@ public class UrlsController {
             return;
         }
 
-        Url urlForSave = new Url(normalizedUrl, getDate());
-
+        Url urlForSave = new Url(normalizedUrl);
         save(urlForSave);
 
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
@@ -62,18 +55,11 @@ public class UrlsController {
     }
 
     public static void listOfUrls(Context ctx) throws SQLException {
-        List<UrlAndCheck> urlAndChecks = new ArrayList<>();
-        for (Url url : getEntities()) {
-            if (UrlCheckRepository.getLastCheckOfUrl(url.getId()) != null) {
-                UrlCheck urlCheck = getLastCheckOfUrl(url.getId());
-                assert urlCheck != null;
-                UrlAndCheck urlAndCheck = new UrlAndCheck(url, urlCheck);
-                urlAndChecks.add(urlAndCheck);
-            } else  {
-                urlAndChecks.add(new UrlAndCheck(url));
-            }
-        }
-        ctx.attribute("urlAndChecks", urlAndChecks);
+        List<Url> urls = UrlRepository.getEntities();
+        Map<Long, UrlCheck> urlChecks = UrlCheckRepository.findLatestChecks();
+
+        ctx.attribute("urls", urls);
+        ctx.attribute("urlChecks", urlChecks);
         ctx.render("urls/urls.html");
     }
 
@@ -85,8 +71,8 @@ public class UrlsController {
         if (url == null) {
             throw new NotFoundResponse();
         }
-
         List<UrlCheck> urlChecks = UrlCheckRepository.getEntitiesByUrlId(id);
+
         ctx.attribute("url", url);
         ctx.attribute("checks", urlChecks);
         ctx.render("urls/show.html");
@@ -95,79 +81,57 @@ public class UrlsController {
     public static void checks(Context ctx) throws SQLException {
         Long id = Long.valueOf(ctx.pathParamAsClass("id", Integer.class).getOrDefault(null));
         Url url = UrlRepository.find(id);
+
         if (url == null) {
             throw new NotFoundResponse();
         }
-        UrlCheckRepository.save(getCheck(url));
+
+        UrlCheckRepository.save(getCheck(url, ctx));
         ctx.attribute("url", url);
         ctx.redirect("/urls/" + id);
     }
 
-    public static UrlCheck getCheck(Url url) {
+    public static UrlCheck getCheck(Url url, Context ctx) {
         String checkedUrlName = url.getName();
-        HttpResponse<String> urlResponse = Unirest
-                .get(checkedUrlName)
-                .asString();
-
-        int urlStatusCode = urlResponse.getStatus();
-
-        Document urlDoc = Jsoup.parse(urlResponse.getBody());
+        HttpResponse<String> urlResponse = null;
         String urlH1Value = "";
-
-        if (urlDoc.select("h1").first() != null) {
-            urlH1Value = urlDoc.select("h1").first().text();
-        }
-
         String urlTitle = "";
-        if (urlDoc.select("title").first() != null) {
-            urlTitle = urlDoc.select("title").first().text();
-        }
-
         String urlDescription = "";
-        if (!urlDoc.select("meta[name=description]").isEmpty()) {
-            urlDescription = urlDoc.select("meta[name=description]")
-                    .get(0)
-                    .attr("content");
-        }
-        return new UrlCheck(
-                urlStatusCode,
-                urlTitle,
-                urlH1Value,
-                urlDescription,
-                (int) url.getId(),
-                getDate());
-    }
-    private static class UrlAndCheck {
-        private long id;
-        private String name;
-        private Instant createdAt;
-        private int statusCode;
+        int urlStatusCode = 0;
 
-        UrlAndCheck(Url url, UrlCheck urlCheck) {
-            this.id = url.getId();
-            this.name = url.getName();
-            this.createdAt = urlCheck.getCreatedAt();
-            this.statusCode = urlCheck.getStatusCode();
-        }
-        UrlAndCheck(Url url) {
-            this.id = url.getId();
-            this.name = url.getName();
-        }
-        public long getId() {
-            return this.id;
-        }
+        try {
+            urlResponse = Unirest
+                    .get(checkedUrlName)
+                    .asString();
+            urlStatusCode = urlResponse.getStatus();
+            Document urlDoc = Jsoup.parse(urlResponse.getBody());
 
-        public String getName() {
-            return this.name;
-        }
+            if (urlDoc.select("h1").first() != null) {
+                urlH1Value = urlDoc.select("h1").first().text();
+            }
 
-        public Instant getCreatedAt() {
-            return this.createdAt;
-        }
+            if (urlDoc.select("title").first() != null) {
+                urlTitle = urlDoc.select("title").first().text();
+            }
 
-        public int getStatusCode() {
-            return this.statusCode;
-        }
+            if (!urlDoc.select("meta[name=description]").isEmpty()) {
+                urlDescription = urlDoc.select("meta[name=description]")
+                        .get(0)
+                        .attr("content");
+            }
 
+            ctx.sessionAttribute("flash", "Проверка добавлена");
+            ctx.sessionAttribute("flash-type", "success");
+            ctx.redirect("/");
+
+            return new UrlCheck(urlStatusCode, urlTitle, urlH1Value, urlDescription, url.getId());
+        } catch (Exception e) {
+
+            ctx.sessionAttribute("flash", "Ошибка при проверке URL");
+            ctx.sessionAttribute("flash-type", "danger");
+            ctx.redirect("/");
+
+            return new UrlCheck(urlStatusCode, urlTitle, urlH1Value, urlDescription, url.getId());
+        }
     }
 }

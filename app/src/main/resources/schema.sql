@@ -1,19 +1,19 @@
 DROP TABLE IF EXISTS urls;
 
 create table urls (
-  id INT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
-  created_at timestamp not null
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS url_checks;
 
 create table url_checks (
-  id INT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   status_code INT NOT NULL,
   title varchar(255),
   h1 varchar(255),
   description text,
   url_id INT,
-  created_at timestamp not null
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

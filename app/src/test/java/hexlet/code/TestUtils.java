@@ -2,12 +2,15 @@ package hexlet.code;
 
 import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.domain.Url;
+import hexlet.code.domain.UrlCheck;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestUtils {
 
@@ -39,7 +42,8 @@ public class TestUtils {
             if (resultSet.next()) {
                 var name = resultSet.getString("name");
                 var createdAt = resultSet.getTimestamp("created_at");
-                var url = new Url(name, createdAt.toInstant());
+                var url = new Url(name);
+                url.setCreatedAt(createdAt);
                 url.setId(id);
                 return url;
             }
@@ -55,5 +59,28 @@ public class TestUtils {
     private static Path getFixturePath(String fileName) {
         return Paths.get("src", "test", "resources", "fixtures", fileName)
                 .toAbsolutePath().normalize();
+    }
+
+    public static Map<Long, UrlCheck> findLatestChecks() throws SQLException {
+        var sql = "SELECT DISTINCT ON (url_id) * from url_checks order by url_id DESC, id DESC";
+        var conn = BaseRepository.getDataSource().getConnection();
+        try (var stmt = conn.prepareStatement(sql)) {
+            var resultSet = stmt.executeQuery();
+            var result = new HashMap<Long, UrlCheck>();
+            while (resultSet.next()) {
+                var id = resultSet.getLong("id");
+                var statusCode = resultSet.getInt("status_code");
+                var title = resultSet.getString("title");
+                var h1 = resultSet.getString("h1");
+                var description = resultSet.getString("description");
+                var urlId = resultSet.getLong("url_id");
+                var createdAt = resultSet.getTimestamp("created_at");
+                var check = new UrlCheck(statusCode, title, h1, description, urlId);
+                check.setId(id);
+                check.setCreatedAt(createdAt);
+                result.put(urlId, check);
+            }
+            return result;
+        }
     }
 }

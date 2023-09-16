@@ -39,9 +39,10 @@ public class AppTest {
         int port = app.port();
         baseUrl = "http://localhost:" + port;
 
-//        //DB connection setup
+        //DB connection setup
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDatabaseUrl());
+        hikariConfig.setMaximumPoolSize(12);
         dataSource = new HikariDataSource(hikariConfig);
 
         BaseRepository.setDataSource(dataSource);
@@ -162,15 +163,17 @@ public class AppTest {
         @Test
         void testShowUrl() {
             String testUrl = mockServer.url("/").toString().replaceAll("/$", "");
+
             Unirest
                     .post(baseUrl + "/urls")
                     .field("url", testUrl)
                     .asEmpty();
+
             HttpResponse<String> response = Unirest
                     .get(baseUrl + "/urls/1")
                     .asString();
-            String body = response.getBody();
 
+            String body = response.getBody();
             assertThat(response.getStatus()).isEqualTo(200);
             assertThat(body).contains(testUrl);
         }
@@ -195,6 +198,14 @@ public class AppTest {
             HttpResponse<String> response = Unirest
                     .get(baseUrl + "/urls/" + id)
                     .asString();
+
+
+            var actualCheckUrl = TestUtils
+                    .findLatestChecks().get(id);
+
+            assertThat(actualCheckUrl).isNotNull();
+            assertThat(actualCheckUrl.getStatusCode()).isEqualTo(200);
+            assertThat(actualCheckUrl.getTitle()).isEqualTo("Test page");
 
             String body = response.getBody();
             assertThat(response.getStatus()).isEqualTo(200);

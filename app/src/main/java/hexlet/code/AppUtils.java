@@ -26,7 +26,6 @@ public class AppUtils {
         return System.getenv().getOrDefault(
                 "JDBC_DATABASE_URL",
                 "jdbc:h2:mem:project");
-
     }
 
     static TemplateEngine getTemplateEngine() {
