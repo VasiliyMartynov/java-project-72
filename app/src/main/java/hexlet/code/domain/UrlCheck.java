@@ -2,21 +2,18 @@ package hexlet.code.domain;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import lombok.Getter;
+import lombok.Setter;
 
 public final class UrlCheck {
 
-    private long id;
-    private int statusCode;
-
-    private String title;
-
-    private String h1;
-
-    private String description;
-
-    private long urlId;
-
-    private Timestamp createdAt;
+    @Getter @Setter private long id;
+    @Getter @Setter private long urlId;
+    @Getter private int statusCode;
+    @Getter private String title;
+    @Getter private String h1;
+    @Getter private String description;
+    @Setter private Timestamp createdAt;
 
     public UrlCheck(int urlStatusCode,
                     String urlTitle,
@@ -31,46 +28,7 @@ public final class UrlCheck {
         this.urlId = urlIdN;
     }
 
-
-
-    public long getId() {
-        return this.id;
-    }
-
-    public Integer getStatusCode() {
-        return this.statusCode;
-    }
-
-    public String getTitle() {
-        return this.title;
-    }
-
-    public String getH1() {
-        return this.h1;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public long getUrlId() {
-        return urlId;
-    }
-
-    public void setId(Long newid) {
-        this.id = newid;
-    }
-
     public Instant getCreatedAt() {
         return this.createdAt.toInstant();
     }
-
-    public void setUrlId(long urlId) {
-        this.urlId = urlId;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
 }
