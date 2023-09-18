@@ -5,11 +5,13 @@ import lombok.Setter;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+@Getter
+@Setter
 public final class Url {
 
-    @Getter @Setter private long id;
-    @Getter private String name;
-    @Setter private Timestamp createdAt;
+    private long id;
+    private String name;
+    private Timestamp createdAt;
 
     public Url(String urlName) {
         this.name = urlName;

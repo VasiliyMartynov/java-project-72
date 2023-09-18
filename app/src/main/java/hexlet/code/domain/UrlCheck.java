@@ -5,15 +5,17 @@ import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 public final class UrlCheck {
 
-    @Getter @Setter private long id;
-    @Getter @Setter private long urlId;
-    @Getter private int statusCode;
-    @Getter private String title;
-    @Getter private String h1;
-    @Getter private String description;
-    @Setter private Timestamp createdAt;
+    private long id;
+    private long urlId;
+    private int statusCode;
+    private String title;
+    private String h1;
+    private String description;
+    private Timestamp createdAt;
 
     public UrlCheck(int urlStatusCode,
                     String urlTitle,
