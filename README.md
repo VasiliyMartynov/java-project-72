@@ -17,7 +17,7 @@ Page Analyzer – сайт, который анализирует указанн
 
 ### Список инструментов
 IDE IntelliJ IDEA,
-Java 17,
+Java 20,
 Gradle,
 checkstyle.sourceforge.io,
 CodeClimate,
